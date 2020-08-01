@@ -10,7 +10,7 @@ edition = "2018"
 bootloader = "*"
 volatile = "0.2.6"
 spin = "0.5.2"
-x86_64 = "0.9.5"
+x86_64 = "0.11"
 uart_16550 = "0.2.0"
 
 [dependencies.lazy_static]
@@ -26,4 +26,8 @@ test-timeout = 300
 
 [[test]]
 name = "should_panic"
+harness = false
+
+[[test]]
+name = "stack_overflow"
 harness = false
