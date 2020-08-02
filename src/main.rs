@@ -10,7 +10,7 @@ use {blog_os::println, core::panic::PanicInfo};
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    blog_os::hlt_loop();
 }
 
 fn print_startup_msg() {
@@ -28,7 +28,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("We didn't crash.");
-    loop {}
+    blog_os::hlt_loop();
 }
 
 #[cfg(test)]
