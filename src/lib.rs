@@ -1,10 +1,15 @@
 #![no_std]
 #![cfg_attr(test, no_main)]
+#![feature(alloc_error_handler)] // at the top of the file
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+extern crate alloc;
+extern crate rlibc;
+
+pub mod allocator;
 pub mod gdt;
 pub mod interrupts;
 pub mod memory;
@@ -16,6 +21,11 @@ pub mod vga_buffer;
 pub enum QemuExitCode {
     Success = 0x10,
     Failed = 0x11,
+}
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
+    panic!("allocation error: {:?}", layout)
 }
 
 pub fn exit_qemu(exit_code: QemuExitCode) {
@@ -46,8 +56,8 @@ pub fn init() {
 
 #[cfg(test)]
 use bootloader::{entry_point, BootInfo};
+use core::panic::PanicInfo;
 
-#[cfg(test)]
 pub fn test_runner(tests: &[&dyn Fn()]) {
     serial_println!("Running {} tests", tests.len());
     for test in tests {
@@ -56,7 +66,6 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
     exit_qemu(QemuExitCode::Success);
 }
 
-#[cfg(test)]
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
